@@ -35,142 +35,140 @@ namespace team302
 {
     namespace gamepad
     {
-
-class TeleopControl
-{
-    public:
-
-        enum FUNCTION_IDENTIFIER
+        class TeleopControl
         {
-            UNKNOWN_FUNCTION,
-            SWERVE_DRIVE_DRIVE,
-            SWERVE_DRIVE_ROTATE,
-            SWERVE_DRIVE_STEER,
-            DRIVE_FULL,
-            DRIVE_75PERCENT,
-            DRIVE_50PERCENT,
-            DRIVE_25PERCENT,
-            DRIVE_SHIFT_UP,
-            DRIVE_SHIFT_DOWN,
-            DRIVE_TURBO,
-            DRIVE_BRAKE,
-            BALL_TRANSFER_OFF,
-            BALL_TRANSFER_TO_SHOOTER,
-            SHOOTER_PREPARE_TO_SHOOT_GREEN,
-            SHOOTER_PREPARE_TO_SHOOT_YELLOW,
-            SHOOTER_PREPARE_TO_SHOOT_BLUE,
-            SHOOTER_PREPARE_TO_SHOOT_RED,
-            SHOOTER_SHOOT,
-            TURRET_LIMELIGHT_AIM,
-            REZERO_PIGEON,
-            AUTO_DRIVE_TO_YELLOW,
-            AUTO_DRIVE_TO_LOADING_ZONE,
-            TURN_AROUND_FRONT_RIGHT,
-            MAX_FUNCTIONS
+            public:
+
+                enum FUNCTION_IDENTIFIER
+                {
+                    UNKNOWN_FUNCTION,
+                    SWERVE_DRIVE_DRIVE,
+                    SWERVE_DRIVE_ROTATE,
+                    SWERVE_DRIVE_STEER,
+                    DRIVE_FULL,
+                    DRIVE_75PERCENT,
+                    DRIVE_50PERCENT,
+                    DRIVE_25PERCENT,
+                    DRIVE_SHIFT_UP,
+                    DRIVE_SHIFT_DOWN,
+                    DRIVE_TURBO,
+                    DRIVE_BRAKE,
+                    BALL_TRANSFER_OFF,
+                    BALL_TRANSFER_TO_SHOOTER,
+                    SHOOTER_PREPARE_TO_SHOOT_GREEN,
+                    SHOOTER_PREPARE_TO_SHOOT_YELLOW,
+                    SHOOTER_PREPARE_TO_SHOOT_BLUE,
+                    SHOOTER_PREPARE_TO_SHOOT_RED,
+                    SHOOTER_SHOOT,
+                    TURRET_LIMELIGHT_AIM,
+                    REZERO_PIGEON,
+                    AUTO_DRIVE_TO_YELLOW,
+                    AUTO_DRIVE_TO_LOADING_ZONE,
+                    TURN_AROUND_FRONT_RIGHT,
+                    MAX_FUNCTIONS
+                };
+
+
+                //----------------------------------------------------------------------------------
+                // Method:      GetInstance
+                // Description: If there isn't an instance of this class, it will create one.  The
+                //              single class instance will be returned.
+                // Returns:     OperatorInterface*  instance of this class
+                //----------------------------------------------------------------------------------
+                static team302::gamepad::TeleopControl* GetInstance();
+
+
+                //------------------------------------------------------------------
+                // Method:      SetScaleFactor
+                // Description: Allow the range of values to be set smaller than
+                //              -1.0 to 1.0.  By providing a scale factor between 0.0
+                //              and 1.0, the range can be made smaller.  If a value
+                //              outside the range is provided, then the value will
+                //              be set to the closest bounding value (e.g. 1.5 will
+                //              become 1.0)
+                // Returns:     void
+                //------------------------------------------------------------------
+                void SetAxisScaleFactor
+                (
+                    team302::gamepad::TeleopControl::FUNCTION_IDENTIFIER  axis,          // <I> - axis number to update
+                    double                              scaleFactor    // <I> - scale factor used to limit the range
+                );
+
+                void SetDeadBand
+                (
+                    team302::gamepad::TeleopControl::FUNCTION_IDENTIFIER  axis,
+                    team302::gamepad::IDragonGamePad::AXIS_DEADBAND       deadband
+                );
+
+                void SetSlewRateLimiter
+                (
+                    team302::gamepad::TeleopControl::FUNCTION_IDENTIFIER  axis,
+                    double                               slewRateLimiter
+                );
+
+                //------------------------------------------------------------------
+                // Method:      SetAxisProfile
+                // Description: Sets the axis profile for the specifed axis
+                // Returns:     void
+                //------------------------------------------------------------------
+                void SetAxisProfile
+                (
+                    team302::gamepad::TeleopControl::FUNCTION_IDENTIFIER      axis,       // <I> - axis number to update
+        			team302::gamepad::IDragonGamePad::AXIS_PROFILE			profile     // <I> - profile to use
+                );
+
+                //------------------------------------------------------------------
+                // Method:      GetAxisValue
+                // Description: Reads the joystick axis, removes any deadband (small
+                //              value) and then scales as requested.
+                // Returns:     double   -  scaled axis value
+                //------------------------------------------------------------------
+                double GetAxisValue
+                (
+                    team302::gamepad::TeleopControl::FUNCTION_IDENTIFIER     axis // <I> - axis number to update
+                ) const;
+
+                //------------------------------------------------------------------
+                // Method:      GetRawButton
+                // Description: Reads the button value.  Also allows POV, bumpers,
+                //              and triggers to be treated as buttons.
+                // Returns:     bool   -  scaled axis value
+                //------------------------------------------------------------------
+                bool IsButtonPressed
+                (
+                    team302::gamepad::TeleopControl::FUNCTION_IDENTIFIER button   // <I> - button number to query
+                ) const;
+
+
+            private:
+                //----------------------------------------------------------------------------------
+                // Method:      OperatorInterface <<constructor>>
+                // Description: This will construct and initialize the object
+                //----------------------------------------------------------------------------------
+                TeleopControl();
+
+                //----------------------------------------------------------------------------------
+                // Method:      ~OperatorInterface <<destructor>>
+                // Description: This will clean up the object
+                //----------------------------------------------------------------------------------
+                virtual ~TeleopControl() = default;
+
+                //----------------------------------------------------------------------------------
+                // Attributes
+                //----------------------------------------------------------------------------------
+                static team302::gamepad::TeleopControl*               m_instance; // Singleton instance of this class
+
+                std::map<FUNCTION_IDENTIFIER, team302::gamepad::IDragonGamePad::AXIS_IDENTIFIER> m_axisMap;
+                std::map<FUNCTION_IDENTIFIER, team302::gamepad::IDragonGamePad::BUTTON_IDENTIFIER> m_buttonMap;
+                std::map<FUNCTION_IDENTIFIER, int> m_controllerMap;
+
+                std::vector<team302::gamepad::IDragonGamePad::AXIS_IDENTIFIER>     m_axisIDs;
+                std::vector<team302::gamepad::IDragonGamePad::BUTTON_IDENTIFIER>   m_buttonIDs;
+                std::vector<int>							     m_controllerIndex;
+
+                team302::gamepad::IDragonGamePad*			            m_controllers[frc::DriverStation::kJoystickPorts];
+
+                mutable int                         m_count;
         };
-
-
-        //----------------------------------------------------------------------------------
-        // Method:      GetInstance
-        // Description: If there isn't an instance of this class, it will create one.  The
-        //              single class instance will be returned.
-        // Returns:     OperatorInterface*  instance of this class
-        //----------------------------------------------------------------------------------
-        static TeleopControl* GetInstance();
-
-
-        //------------------------------------------------------------------
-        // Method:      SetScaleFactor
-        // Description: Allow the range of values to be set smaller than
-        //              -1.0 to 1.0.  By providing a scale factor between 0.0
-        //              and 1.0, the range can be made smaller.  If a value
-        //              outside the range is provided, then the value will
-        //              be set to the closest bounding value (e.g. 1.5 will
-        //              become 1.0)
-        // Returns:     void
-        //------------------------------------------------------------------
-        void SetAxisScaleFactor
-        (
-            TeleopControl::FUNCTION_IDENTIFIER  axis,          // <I> - axis number to update
-            double                              scaleFactor    // <I> - scale factor used to limit the range
-        );
-
-        void SetDeadBand
-        (
-            TeleopControl::FUNCTION_IDENTIFIER  axis,
-            team302::gamepad::IDragonGamePad::AXIS_DEADBAND       deadband
-        );
-
-        void SetSlewRateLimiter
-        (
-            TeleopControl::FUNCTION_IDENTIFIER  axis,
-            double                               slewRateLimiter
-        );
-
-        //------------------------------------------------------------------
-        // Method:      SetAxisProfile
-        // Description: Sets the axis profile for the specifed axis
-        // Returns:     void
-        //------------------------------------------------------------------
-        void SetAxisProfile
-        (
-            TeleopControl::FUNCTION_IDENTIFIER      axis,       // <I> - axis number to update
-			team302::gamepad::IDragonGamePad::AXIS_PROFILE			profile     // <I> - profile to use
-        );
-
-        //------------------------------------------------------------------
-        // Method:      GetAxisValue
-        // Description: Reads the joystick axis, removes any deadband (small
-        //              value) and then scales as requested.
-        // Returns:     double   -  scaled axis value
-        //------------------------------------------------------------------
-        double GetAxisValue
-        (
-            TeleopControl::FUNCTION_IDENTIFIER     axis // <I> - axis number to update
-        ) const;
-
-        //------------------------------------------------------------------
-        // Method:      GetRawButton
-        // Description: Reads the button value.  Also allows POV, bumpers,
-        //              and triggers to be treated as buttons.
-        // Returns:     bool   -  scaled axis value
-        //------------------------------------------------------------------
-        bool IsButtonPressed
-        (
-            TeleopControl::FUNCTION_IDENTIFIER button   // <I> - button number to query
-        ) const;
-
-
-    private:
-        //----------------------------------------------------------------------------------
-        // Method:      OperatorInterface <<constructor>>
-        // Description: This will construct and initialize the object
-        //----------------------------------------------------------------------------------
-        TeleopControl();
-
-        //----------------------------------------------------------------------------------
-        // Method:      ~OperatorInterface <<destructor>>
-        // Description: This will clean up the object
-        //----------------------------------------------------------------------------------
-        virtual ~TeleopControl() = default;
-
-        //----------------------------------------------------------------------------------
-        // Attributes
-        //----------------------------------------------------------------------------------
-        static TeleopControl*               m_instance; // Singleton instance of this class
-
-        std::map<FUNCTION_IDENTIFIER, team302::gamepad::IDragonGamePad::AXIS_IDENTIFIER> m_axisMap;
-        std::map<FUNCTION_IDENTIFIER, team302::gamepad::IDragonGamePad::BUTTON_IDENTIFIER> m_buttonMap;
-        std::map<FUNCTION_IDENTIFIER, int> m_controllerMap;
-
-        std::vector<team302::gamepad::IDragonGamePad::AXIS_IDENTIFIER>     m_axisIDs;
-        std::vector<team302::gamepad::IDragonGamePad::BUTTON_IDENTIFIER>   m_buttonIDs;
-        std::vector<int>							     m_controllerIndex;
-
-        team302::gamepad::IDragonGamePad*			            m_controllers[frc::DriverStation::kJoystickPorts];
-
-        mutable int                         m_count;
-};
-
     }
 }
